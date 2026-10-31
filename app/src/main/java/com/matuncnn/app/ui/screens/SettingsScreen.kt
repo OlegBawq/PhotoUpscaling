@@ -294,7 +294,7 @@ private fun GeneralTab(settings: AppSettings, viewModel: MainViewModel) {
                         Button(
                             onClick = {
                                 val intent = Intent(Intent.ACTION_VIEW,
-                                    Uri.parse("https://github.com/OlegBawq/PhotoForge"))
+                                    Uri.parse("https://github.com/OlegBawq/PhotoUpscaling"))
                                 ctx.startActivity(intent)
                             },
                             modifier = Modifier.weight(1f)

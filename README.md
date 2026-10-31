@@ -4,6 +4,10 @@
 использует тёмную палитру с синими акцентами. Выпуск 1.1.0 подписывается
 отдельным ключом, который не хранится в репозитории.
 
+Скачать: [Android APK](dist/PhotoForge-Android-v1.1.0.apk) ·
+[Windows x64](dist/PhotoForge-Windows-x64.zip).
+Windows-версия находится в ZIP: распакуйте архив и запустите `PhotoForge.exe`.
+
 Проект основан на [MatUnCNN](https://github.com/Celesth/MatUnCNN), который
 использует [RealSR-NCNN-Android](https://github.com/tumuyan/RealSR-NCNN-Android)
 и [ncnn](https://github.com/Tencent/ncnn). Сохраняйте лицензии и уведомления
