@@ -17,6 +17,7 @@
 !app/src/main/assets/realsr/models-Real-ESRGAN/x4.bin
 *.mnn
 *.so
+!app/src/main/assets/realsr/libncnn.so
 *.o
 *.a
 app/src/main/assets/realsr/Anime4k

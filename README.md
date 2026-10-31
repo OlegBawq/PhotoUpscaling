@@ -1,10 +1,10 @@
 # PhotoForge для Android
 
 Улучшение фотографий на устройстве с Real-ESRGAN 4×. Интерфейс PhotoForge
-использует тёмную палитру с синими акцентами. Выпуск 1.1.0 подписывается
+использует тёмную палитру с синими акцентами. Выпуск 1.1.1 подписывается
 отдельным ключом, который не хранится в репозитории.
 
-Скачать: [Android APK](dist/PhotoForge-Android-v1.1.0.apk) ·
+Скачать: [Android APK](dist/PhotoForge-Android-v1.1.1.apk) ·
 [Windows x64](dist/PhotoForge-Windows-x64.zip).
 Windows-версия находится в ZIP: распакуйте архив и запустите `PhotoForge.exe`.
 
