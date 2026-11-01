@@ -295,11 +295,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val aiOutputPath = File(app.workDir, "ai_${timestamp}.png").absolutePath
             val aiInputPath = File(app.workDir, "ai_input_${timestamp}.png").absolutePath
             val targetScale = NaturalBlendProcessor.recommendedScale(inputForCommand)
+            val aiScale = if (targetScale == 4) 2 else targetScale
 
-            // Parse scale from command
-            val scaleMatch = Regex("-s\\s+(\\d+)").find(cmd)
-            val scaleText = if (scaleMatch != null) "x${scaleMatch.groupValues[1]}" else ""
-            _uiState.update { it.copy(scaleText = scaleText) }
+            _uiState.update { it.copy(scaleText = "x$targetScale") }
 
             // Inject -g -1 for CPU mode on Adreno
             val cpuForced = state.useCpuFallback && isNcnnCommand(cmd)
@@ -308,7 +306,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             } else cmd
             val preparedInput = if (aiStrength > 0) {
                 val prepared = withContext(Dispatchers.IO) {
-                    NaturalBlendProcessor.prepareAiInput(inputForCommand, aiInputPath, targetScale)
+                    NaturalBlendProcessor.prepareAiInput(inputForCommand, aiInputPath, aiScale)
                 }
                 if (prepared.isFailure) {
                     _uiState.update { it.copy(statusMessage = "Failed: ${prepared.exceptionOrNull()?.message}") }
@@ -332,7 +330,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             // Check cache
             val cacheKey = UpscaleCache.buildKey(
                 (state.inputUri?.toString() ?: inputFile),
-                "$cmd|strength=$aiStrength",
+                "$cmd|strength=$aiStrength|aiScale=$aiScale",
                 targetScale
             )
             val cached = UpscaleCache.get(cacheKey)
