@@ -12,9 +12,9 @@
     <string name="profile_balance">平衡</string>
     <string name="profile_max">最大</string>
     <string name="profile_no_ai_desc">快速高质量放大，不重绘</string>
-    <string name="profile_soft_desc" formatted="false">20% AI · 最大程度保留原图</string>
-    <string name="profile_balance_desc" formatted="false">35% AI · 自然均衡清理</string>
-    <string name="profile_max_desc" formatted="false">50% AI · 加强修复但不完全重绘</string>
+    <string name="profile_soft_desc" formatted="false">30% AI · 快速 x2 细节，改动最少</string>
+    <string name="profile_balance_desc" formatted="false">55% AI · 高质量 x3 细节和自然观感</string>
+    <string name="profile_max_desc" formatted="false">75% AI · 完整 x4 修复，耗时更长</string>
     <string name="improve_photo">增强照片</string>
     <string name="restoring">正在修复…</string>
     <string name="stop_processing">停止</string>

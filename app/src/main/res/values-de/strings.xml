@@ -12,9 +12,9 @@
     <string name="profile_balance">Ausgewogen</string>
     <string name="profile_max">Maximum</string>
     <string name="profile_no_ai_desc">Schnelle hochwertige Skalierung ohne Neuzeichnen</string>
-    <string name="profile_soft_desc" formatted="false">20% KI · bewahrt das Original maximal</string>
-    <string name="profile_balance_desc" formatted="false">35% KI · natürliche, ausgewogene Reinigung</string>
-    <string name="profile_max_desc" formatted="false">50% KI · stärkere Wiederherstellung ohne Neuzeichnen</string>
+    <string name="profile_soft_desc" formatted="false">30% KI · schnelle x2-Details mit minimalen Änderungen</string>
+    <string name="profile_balance_desc" formatted="false">55% KI · hochwertige x3-Details und natürliche Optik</string>
+    <string name="profile_max_desc" formatted="false">75% KI · vollständige x4-Wiederherstellung, dauert länger</string>
     <string name="improve_photo">Foto verbessern</string>
     <string name="restoring">Wiederherstellung…</string>
     <string name="stop_processing">Stoppen</string>

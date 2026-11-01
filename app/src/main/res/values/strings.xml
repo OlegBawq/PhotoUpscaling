@@ -12,9 +12,9 @@
     <string name="profile_balance">Balance</string>
     <string name="profile_max">Maximum</string>
     <string name="profile_no_ai_desc">Fast high-quality resizing without redrawing</string>
-    <string name="profile_soft_desc" formatted="false">20% AI · preserves the source as much as possible</string>
-    <string name="profile_balance_desc" formatted="false">35% AI · balanced cleanup and natural detail</string>
-    <string name="profile_max_desc" formatted="false">50% AI · stronger restoration without full redrawing</string>
+    <string name="profile_soft_desc" formatted="false">30% AI · fast x2 detail with minimal changes</string>
+    <string name="profile_balance_desc" formatted="false">55% AI · quality x3 detail with a natural look</string>
+    <string name="profile_max_desc" formatted="false">75% AI · full x4 restoration, takes longer</string>
     <string name="improve_photo">Improve photo</string>
     <string name="restoring">Restoring…</string>
     <string name="stop_processing">Stop</string>

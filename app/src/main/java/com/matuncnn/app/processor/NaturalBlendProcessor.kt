@@ -24,6 +24,16 @@ object NaturalBlendProcessor {
         }
     }
 
+    fun maximumSafeAiScale(inputPath: String): Int {
+        val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeFile(inputPath, options)
+        require(options.outWidth > 0 && options.outHeight > 0) { "Cannot read image size" }
+        val pixels = options.outWidth.toLong() * options.outHeight
+        return (1..4).lastOrNull { scale ->
+            pixels * scale * scale <= MAX_OUTPUT_PIXELS
+        } ?: 1
+    }
+
     fun prepareAiInput(inputPath: String, outputPath: String, targetScale: Int): Result<Unit> =
         runCatching {
             val source = decodeBitmap(inputPath)

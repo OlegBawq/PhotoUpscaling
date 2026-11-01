@@ -12,9 +12,9 @@
     <string name="profile_balance">Баланс</string>
     <string name="profile_max">Максимум</string>
     <string name="profile_no_ai_desc">Быстрое качественное увеличение без перерисовки</string>
-    <string name="profile_soft_desc" formatted="false">20% ИИ · максимально сохраняет оригинал</string>
-    <string name="profile_balance_desc" formatted="false">35% ИИ · баланс очистки и естественности</string>
-    <string name="profile_max_desc" formatted="false">50% ИИ · усиленное восстановление без полной перерисовки</string>
+    <string name="profile_soft_desc" formatted="false">30% ИИ · быстрые x2-детали, минимум изменений</string>
+    <string name="profile_balance_desc" formatted="false">55% ИИ · качественные x3-детали и естественный вид</string>
+    <string name="profile_max_desc" formatted="false">75% ИИ · полноценное x4-восстановление, работает дольше</string>
     <string name="improve_photo">Улучшить фото</string>
     <string name="restoring">Восстановление…</string>
     <string name="stop_processing">Остановить</string>

@@ -17,7 +17,7 @@ class SettingsRepository(private val context: Context) {
 
     val settingsFlow: Flow<AppSettings> = context.dataStore.data.map { prefs ->
         AppSettings(
-            selectCommand = prefs[SELECT_COMMAND] ?: 0,
+            selectCommand = prefs[SELECT_COMMAND] ?: 2,
             tileSize = prefs[TILE_SIZE] ?: 0,
             extraCommand = prefs[EXTRA_COMMAND] ?: "",
             defaultCommand = prefs[DEFAULT_COMMAND] ?: "",
@@ -86,7 +86,7 @@ class SettingsRepository(private val context: Context) {
 
     private fun settingsFromPrefs(prefs: Preferences, ctx: Context): AppSettings {
         return AppSettings(
-            selectCommand = prefs[SELECT_COMMAND] ?: 0,
+            selectCommand = prefs[SELECT_COMMAND] ?: 2,
             tileSize = prefs[TILE_SIZE] ?: 0,
             extraCommand = prefs[EXTRA_COMMAND] ?: "",
             defaultCommand = prefs[DEFAULT_COMMAND] ?: "",
@@ -151,7 +151,7 @@ class SettingsRepository(private val context: Context) {
 }
 
 data class AppSettings(
-    val selectCommand: Int = 0,
+    val selectCommand: Int = 2,
     val tileSize: Int = 0,
     val extraCommand: String = "",
     val defaultCommand: String = "",

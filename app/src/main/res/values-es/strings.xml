@@ -12,9 +12,9 @@
     <string name="profile_balance">Equilibrado</string>
     <string name="profile_max">Máximo</string>
     <string name="profile_no_ai_desc">Escalado rápido y de calidad sin redibujar</string>
-    <string name="profile_soft_desc" formatted="false">20% IA · conserva al máximo el original</string>
-    <string name="profile_balance_desc" formatted="false">35% IA · limpieza natural y equilibrada</string>
-    <string name="profile_max_desc" formatted="false">50% IA · restauración fuerte sin redibujar</string>
+    <string name="profile_soft_desc" formatted="false">30% IA · detalles x2 rápidos con cambios mínimos</string>
+    <string name="profile_balance_desc" formatted="false">55% IA · detalles x3 de calidad y aspecto natural</string>
+    <string name="profile_max_desc" formatted="false">75% IA · restauración x4 completa, tarda más</string>
     <string name="improve_photo">Mejorar foto</string>
     <string name="restoring">Restaurando…</string>
     <string name="stop_processing">Detener</string>

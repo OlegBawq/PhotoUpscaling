@@ -212,8 +212,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _uiState.update {
             it.copy(
                 selectedCommandIndex = index,
-                commandText = cmd
+                commandText = cmd,
+                settings = it.settings.copy(selectCommand = index)
             )
+        }
+        viewModelScope.launch {
+            settingsRepo.update { it.copy(selectCommand = index) }
         }
         viewModelScope.launch {
             settingsRepo.update { it.copy(selectCommand = index) }
@@ -285,8 +289,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val outputFileName = "upscaled_${timestamp}.png"
             val outputPath = "$saveDir/$outputFileName"
             File(outputPath).delete()
-            val aiStrength = listOf(0, 20, 35, 50)
-                .getOrElse(state.selectedCommandIndex) { 35 }
+            val aiStrength = listOf(0, 30, 55, 75)
+                .getOrElse(state.selectedCommandIndex) { 55 }
             val aiOutputPath = File(app.workDir, "ai_${timestamp}.png").absolutePath
             val aiInputPath = File(app.workDir, "ai_input_${timestamp}.png").absolutePath
             val targetScale = runCatching {
@@ -295,11 +299,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 _uiState.update { it.copy(statusMessage = "Failed: ${error.message}") }
                 return@launch
             }
-            val aiScale = when (targetScale) {
-                4 -> 2
-                2 -> 1
-                else -> 1
-            }
+            val requestedAiScale = listOf(1, 2, 3, 4)
+                .getOrElse(state.selectedCommandIndex) { 3 }
+            val aiScale = minOf(
+                requestedAiScale,
+                NaturalBlendProcessor.maximumSafeAiScale(inputForCommand)
+            )
 
             _uiState.update { it.copy(scaleText = "x$targetScale") }
 
