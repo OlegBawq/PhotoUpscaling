@@ -1,0 +1,11 @@
+PhotoForge model notices
+
+Real-ESRGAN x4 model
+Source: https://github.com/xinntao/Real-ESRGAN
+Licence: BSD-3-Clause
+
+4x-UltraSharp by Kim2091
+Source: https://github.com/upscayl/upscayl/tree/main/resources/models
+Licence: CC BY-NC-SA 4.0
+https://creativecommons.org/licenses/by-nc-sa/4.0/
+Non-commercial use only.

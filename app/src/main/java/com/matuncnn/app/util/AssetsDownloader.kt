@@ -23,7 +23,10 @@ object AssetsDownloader {
     private val REQUIRED_ASSETS = listOf(
         "realsr-ncnn",
         "libncnn.so",
-        "models-Real-ESRGAN/x4.bin"
+        "models-PhotoForge-Natural/x4.bin",
+        "models-PhotoForge-Natural/x4.param",
+        "models-PhotoForge-UltraSharp/x4.bin",
+        "models-PhotoForge-UltraSharp/x4.param"
     )
 
     suspend fun needsDownload(workDir: String): Boolean {

@@ -243,6 +243,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val context = getApplication<Application>()
             app.ensureWorkDir()
 
+            val modelResult = withContext(Dispatchers.IO) {
+                activateModel(state.selectedCommandIndex, app.workDir)
+            }
+            if (modelResult.isFailure) {
+                val message = "Model error: ${modelResult.exceptionOrNull()?.message}"
+                _uiState.update {
+                    it.copy(isProcessing = false, statusMessage = message, logText = message)
+                }
+                return@launch
+            }
+
             val validationError = validateCommandAssets(cmd, app.workDir)
             if (validationError != null) {
                 _uiState.update {
@@ -490,6 +501,37 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
         return null
+    }
+
+    private fun activateModel(profileIndex: Int, workDir: String): Result<Unit> = runCatching {
+        val modelName = if (profileIndex >= 2) {
+            "models-PhotoForge-UltraSharp"
+        } else {
+            "models-PhotoForge-Natural"
+        }
+        val sourceDir = File(workDir, modelName)
+        val activeDir = File(workDir, "models-Real-ESRGAN")
+        val marker = File(activeDir, "photoforge-model.txt")
+        val targetBin = File(activeDir, "x4.bin")
+        val targetParam = File(activeDir, "x4.param")
+        if (marker.takeIf { it.isFile }?.readText() == modelName &&
+            targetBin.length() > 0 && targetParam.length() > 0
+        ) {
+            return@runCatching
+        }
+
+        activeDir.mkdirs()
+        listOf("x4.bin", "x4.param").forEach { fileName ->
+            val source = File(sourceDir, fileName)
+            require(source.isFile && source.length() > 0) { "Missing $modelName/$fileName" }
+            val target = File(activeDir, fileName)
+            val temporary = File(activeDir, "$fileName.tmp")
+            source.copyTo(temporary, overwrite = true)
+            if (target.exists() && !target.delete()) error("Cannot replace $fileName")
+            if (!temporary.renameTo(target)) error("Cannot activate $fileName")
+        }
+        marker.writeText(modelName)
+        DebugLog.log("Model", "Activated $modelName")
     }
 
     fun cancelProcessing() {
