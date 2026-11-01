@@ -295,12 +295,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val aiOutputPath = File(app.workDir, "ai_${timestamp}.png").absolutePath
             val aiInputPath = File(app.workDir, "ai_input_${timestamp}.png").absolutePath
             val targetScale = NaturalBlendProcessor.recommendedScale(inputForCommand)
-            val aiScale = if (targetScale == 4) 2 else targetScale
+            val aiScale = when (targetScale) {
+                4 -> 2
+                2 -> 1
+                else -> 1
+            }
 
             _uiState.update { it.copy(scaleText = "x$targetScale") }
 
             // Inject -g -1 for CPU mode on Adreno
-            val cpuForced = state.useCpuFallback && isNcnnCommand(cmd)
+            // The bundled Vulkan path produces corrupted tiles on some Mali drivers.
+            // The lightweight pipeline uses CPU inference for deterministic output.
+            val cpuForced = isNcnnCommand(cmd)
             val selectedCmd = if (isNcnnCommand(cmd) && !cmd.contains(" -j ")) {
                 "$cmd -j 1:4:2"
             } else cmd
@@ -324,7 +330,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             if (cpuForced) {
-                DebugLog.log("Upscale", "Adreno detected — forcing CPU mode (-g -1)")
+                DebugLog.log("Upscale", "Safe CPU inference enabled (-g -1)")
             }
 
             // Check cache
