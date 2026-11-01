@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_subtitle">Fotowiederherstellung · Real-ESRGAN · offline</string>
+    <string name="preparing_engines">Engines werden vorbereitet…</string>
+    <string name="select_photo">Foto auswählen</string>
+    <string name="ready_processing">Bereit zur Verarbeitung</string>
+    <string name="change_photo">Ändern</string>
+    <string name="recovery_strength">WIEDERHERSTELLUNGSSTÄRKE</string>
+    <string name="profile_no_ai">Ohne KI</string>
+    <string name="profile_soft">Sanft</string>
+    <string name="profile_balance">Ausgewogen</string>
+    <string name="profile_max">Maximum</string>
+    <string name="profile_no_ai_desc">Schnelle hochwertige Skalierung ohne Neuzeichnen</string>
+    <string name="profile_soft_desc">20% KI · bewahrt das Original maximal</string>
+    <string name="profile_balance_desc">35% KI · natürliche, ausgewogene Reinigung</string>
+    <string name="profile_max_desc">50% KI · stärkere Wiederherstellung ohne Neuzeichnen</string>
+    <string name="improve_photo">Foto verbessern</string>
+    <string name="restoring">Wiederherstellung…</string>
+    <string name="stop_processing">Stoppen</string>
+    <string name="result_title">Ergebnis</string>
+    <string name="nav_home">Verbessern</string>
+    <string name="nav_settings">Einstellungen</string>
+    <string name="settings_title">Einstellungen</string>
+    <string name="language_title">App-Sprache</string>
+    <string name="lang_system">Systemstandard</string>
+    <string name="performance_title">Leistung</string>
+    <string name="tile_size_label">Kachelgröße (0 = automatisch)</string>
+    <string name="auto_save_results">Ergebnisse automatisch speichern</string>
+    <string name="cpu_mode">CPU-Kompatibilitätsmodus</string>
+    <string name="github_button">GitHub · OlegBawq</string>
+    <string name="telegram_button">Telegram · @niix3</string>
+    <string name="source_button">PhotoForge-Quellcode</string>
+</resources>

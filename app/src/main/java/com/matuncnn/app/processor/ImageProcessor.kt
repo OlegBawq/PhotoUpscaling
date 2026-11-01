@@ -99,11 +99,14 @@ class ImageProcessor {
         } catch (e: InterruptedException) {
             Log.w("ImageProcessor", "Process interrupted")
             DebugLog.log("Upscale", "Interrupted")
+            resultBuilder.appendLine("Process interrupted")
             callback.onError("Process interrupted")
         } catch (e: Exception) {
             Log.e("ImageProcessor", "Error executing process", e)
             DebugLog.log("Upscale", "Error: ${e.message}")
-            callback.onError(e.message ?: "Unknown error")
+            val message = e.message ?: "Unknown error"
+            resultBuilder.appendLine(message)
+            callback.onError(message)
         } finally {
             currentProcess?.destroy()
             currentProcess = null

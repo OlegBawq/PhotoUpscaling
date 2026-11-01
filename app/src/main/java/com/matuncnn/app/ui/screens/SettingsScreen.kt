@@ -5,6 +5,8 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.os.LocaleList
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -32,6 +34,7 @@ import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -59,6 +62,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -72,28 +76,14 @@ import com.matuncnn.app.viewmodel.MainViewModel
 @Composable
 fun SettingsScreen(viewModel: MainViewModel) {
     val state by viewModel.uiState.collectAsState()
-    val settings = state.settings
-    var tabIndex by remember { mutableIntStateOf(0) }
-    val tabs = listOf("General", "Debug")
-
     Column(modifier = Modifier.fillMaxSize()) {
-        ScrollableTabRow(
-            selectedTabIndex = tabIndex,
-            edgePadding = 0.dp
-        ) {
-            tabs.forEachIndexed { i, title ->
-                Tab(
-                    selected = tabIndex == i,
-                    onClick = { tabIndex = i },
-                    text = { Text(title, fontWeight = if (tabIndex == i) FontWeight.Bold else FontWeight.Normal) }
-                )
-            }
-        }
-
-        when (tabIndex) {
-            0 -> GeneralTab(settings, viewModel)
-            1 -> DebugTab()
-        }
+        Text(
+            stringResource(com.matuncnn.app.R.string.settings_title),
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(16.dp)
+        )
+        GeneralTab(state.settings, viewModel)
     }
 }
 
@@ -101,11 +91,139 @@ fun SettingsScreen(viewModel: MainViewModel) {
 
 @Composable
 private fun GeneralTab(settings: AppSettings, viewModel: MainViewModel) {
+    val context = LocalContext.current
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(12.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
+        item(key = "language_simple") {
+            Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(stringResource(com.matuncnn.app.R.string.language_title), style = MaterialTheme.typography.titleMedium)
+                    Spacer(Modifier.height(8.dp))
+                    val tags = listOf("", "ru", "en", "de", "es", "zh")
+                    val savedTag = context.getSharedPreferences("photoforge_language", Context.MODE_PRIVATE)
+                        .getString("tag", "") ?: ""
+                    SettingDropdown(
+                        listOf(
+                            stringResource(com.matuncnn.app.R.string.lang_system),
+                            "Русский", "English", "Deutsch", "Español", "中文"
+                        ),
+                        tags.indexOf(savedTag).coerceAtLeast(0)
+                    ) { index ->
+                        val tag = tags[index]
+                        context.getSharedPreferences("photoforge_language", Context.MODE_PRIVATE)
+                            .edit().putString("tag", tag).apply()
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            context.getSystemService(android.app.LocaleManager::class.java)
+                                .applicationLocales = LocaleList.forLanguageTags(tag)
+                        } else {
+                            val locale = if (tag.isBlank()) java.util.Locale.getDefault()
+                                else java.util.Locale.forLanguageTag(tag)
+                            java.util.Locale.setDefault(locale)
+                            val config = context.resources.configuration
+                            config.setLocale(locale)
+                            context.resources.updateConfiguration(config, context.resources.displayMetrics)
+                            (context as? android.app.Activity)?.recreate()
+                        }
+                    }
+                }
+            }
+        }
+        item(key = "performance_simple") {
+            Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(stringResource(com.matuncnn.app.R.string.performance_title), style = MaterialTheme.typography.titleMedium)
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = settings.tileSize.toString(),
+                        onValueChange = { value ->
+                            viewModel.updateSettings(settings.copy(tileSize = value.toIntOrNull() ?: 0))
+                        },
+                        label = { Text(stringResource(com.matuncnn.app.R.string.tile_size_label)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                    SettingToggle(stringResource(com.matuncnn.app.R.string.auto_save_results), settings.autoSave) {
+                        viewModel.updateSettings(settings.copy(autoSave = it))
+                    }
+                    SettingToggle(stringResource(com.matuncnn.app.R.string.cpu_mode), settings.useCPU) {
+                        viewModel.updateSettings(settings.copy(useCPU = it))
+                    }
+                }
+            }
+        }
+        item(key = "about_simple") {
+            Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp)) {
+                Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("PhotoForge", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                    Text("v${BuildConfig.VERSION_NAME}", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(Modifier.height(12.dp))
+                    OutlinedButton(
+                        onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/OlegBawq"))) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text(stringResource(com.matuncnn.app.R.string.github_button)) }
+                    OutlinedButton(
+                        onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/niix3"))) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text(stringResource(com.matuncnn.app.R.string.telegram_button)) }
+                    OutlinedButton(
+                        onClick = { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/OlegBawq/PhotoUpscaling"))) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text(stringResource(com.matuncnn.app.R.string.source_button)) }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun GeneralTabLegacy(settings: AppSettings, viewModel: MainViewModel) {
+    val context = LocalContext.current
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(12.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        item(key = "language") {
+            Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Язык / Language", style = MaterialTheme.typography.titleMedium)
+                    Spacer(Modifier.height(8.dp))
+                    val selectedLanguage = remember {
+                        when (context.getSharedPreferences("photoforge_language", Context.MODE_PRIVATE)
+                            .getString("tag", "")) {
+                            "ru" -> 1
+                            "en" -> 2
+                            else -> 0
+                        }
+                    }
+                    SettingDropdown(
+                        listOf("Системный / System", "Русский", "English"),
+                        selectedLanguage
+                    ) { index ->
+                        val tag = listOf("", "ru", "en")[index]
+                        context.getSharedPreferences("photoforge_language", Context.MODE_PRIVATE)
+                            .edit().putString("tag", tag).apply()
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            context.getSystemService(android.app.LocaleManager::class.java)
+                                .applicationLocales = LocaleList.forLanguageTags(tag)
+                        } else {
+                            val locale = if (tag.isBlank()) java.util.Locale.getDefault()
+                                else java.util.Locale.forLanguageTag(tag)
+                            java.util.Locale.setDefault(locale)
+                            val config = context.resources.configuration
+                            config.setLocale(locale)
+                            context.resources.updateConfiguration(config, context.resources.displayMetrics)
+                            (context as? android.app.Activity)?.recreate()
+                        }
+                    }
+                }
+            }
+        }
+
         item(key = "tile_size") {
             Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(2.dp)) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -294,15 +412,28 @@ private fun GeneralTab(settings: AppSettings, viewModel: MainViewModel) {
                         Button(
                             onClick = {
                                 val intent = Intent(Intent.ACTION_VIEW,
-                                    Uri.parse("https://github.com/OlegBawq/PhotoUpscaling"))
+                                    Uri.parse("https://t.me/niix3"))
                                 ctx.startActivity(intent)
                             },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Icon(Icons.Filled.Code, null, Modifier.size(16.dp))
+                            Icon(Icons.Filled.Send, null, Modifier.size(16.dp))
                             Spacer(Modifier.width(4.dp))
-                            Text("Исходники")
+                            Text("Telegram")
                         }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    OutlinedButton(
+                        onClick = {
+                            val intent = Intent(Intent.ACTION_VIEW,
+                                Uri.parse("https://github.com/OlegBawq/PhotoUpscaling"))
+                            ctx.startActivity(intent)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Filled.Code, null, Modifier.size(16.dp))
+                        Spacer(Modifier.width(4.dp))
+                        Text("Исходный код PhotoForge")
                     }
                 }
             }

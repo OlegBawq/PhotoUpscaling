@@ -12,6 +12,7 @@ import com.matuncnn.app.data.AppSettings
 import com.matuncnn.app.data.SettingsRepository
 import com.matuncnn.app.processor.CommandListManager
 import com.matuncnn.app.processor.ImageProcessor
+import com.matuncnn.app.processor.NaturalBlendProcessor
 import com.matuncnn.app.util.AssetsCopyer
 import com.matuncnn.app.util.AssetsDownloader
 import com.matuncnn.app.util.DebugLog
@@ -105,6 +106,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
             DebugLog.log("Init", "Copying bundled assets...")
             AssetsCopyer.releaseAssets(context, "realsr", app.workDir, true)
+            pruneLegacyAssets(app.workDir)
             DebugLog.log("Init", "Assets ready")
             true
         }
@@ -142,11 +144,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             ).also { it.loadCustomLabels(settings.customLabelsJson) }
         }
 
-        val defaultCommand = if (settings.defaultCommand.isNotBlank()) {
-            settings.defaultCommand
-        } else {
-            manager.getCommandAt(settings.selectCommand)
-        }
+        val selectedIndex = settings.selectCommand
+            .takeIf { it in 0 until manager.commandCount } ?: 1
+        val defaultCommand = manager.getCommandAt(selectedIndex)
 
         assetsReady.set(true)
 
@@ -155,10 +155,26 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 isInitialized = true,
                 settings = settings,
                 commandManager = manager,
-                selectedCommandIndex = settings.selectCommand,
+                selectedCommandIndex = selectedIndex,
                 showCommandInput = settings.showSearchView,
                 commandText = defaultCommand
             )
+        }
+    }
+
+    private fun pruneLegacyAssets(workDir: String) {
+        val obsolete = listOf(
+            "models-ESRGAN-Nomos8kSC", "models-MNN", "models-nose", "models-pro",
+            "models-Real-ESRGAN-anime", "models-Real-ESRGANv2-anime", "models-se",
+            "Anime4k", "GetMNNInfo", "libMNN.so", "libMNN_CL.so",
+            "libMNN_Express.so", "libMNN_GL.so", "libMNN_Vulkan.so", "libmnncore.so",
+            "magick", "mnnsr-ncnn", "realcugan-ncnn", "resize-ncnn", "srmd-ncnn",
+            "waifu2x-ncnn", "models-Real-ESRGAN-SourceBook",
+            "models-Real-ESRGANv3-anime", "models-Real-ESRGANv3-general"
+        )
+        obsolete.forEach { relativePath ->
+            val target = File(workDir, relativePath)
+            if (target.exists()) target.deleteRecursively()
         }
     }
 
@@ -238,6 +254,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val context = getApplication<Application>()
             app.ensureWorkDir()
 
+            val validationError = validateCommandAssets(cmd, app.workDir)
+            if (validationError != null) {
+                _uiState.update {
+                    it.copy(
+                        isProcessing = false,
+                        statusMessage = validationError,
+                        logText = validationError
+                    )
+                }
+                return@launch
+            }
+
             // Handle input file
             val inputForCommand: String
             if (state.inputUri != null) {
@@ -262,6 +290,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
             val outputFileName = "upscaled_${timestamp}.png"
             val outputPath = "$saveDir/$outputFileName"
+            val aiStrength = listOf(0, 20, 35, 50)
+                .getOrElse(state.selectedCommandIndex) { 35 }
+            val aiOutputPath = File(app.workDir, "ai_${timestamp}.png").absolutePath
+            val aiInputPath = File(app.workDir, "ai_input_${timestamp}.png").absolutePath
+            val targetScale = NaturalBlendProcessor.recommendedScale(inputForCommand)
 
             // Parse scale from command
             val scaleMatch = Regex("-s\\s+(\\d+)").find(cmd)
@@ -270,13 +303,26 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
             // Inject -g -1 for CPU mode on Adreno
             val cpuForced = state.useCpuFallback && isNcnnCommand(cmd)
+            val selectedCmd = if (isNcnnCommand(cmd) && !cmd.contains(" -j ")) {
+                "$cmd -j 1:4:2"
+            } else cmd
+            val preparedInput = if (aiStrength > 0) {
+                val prepared = withContext(Dispatchers.IO) {
+                    NaturalBlendProcessor.prepareAiInput(inputForCommand, aiInputPath, targetScale)
+                }
+                if (prepared.isFailure) {
+                    _uiState.update { it.copy(statusMessage = "Failed: ${prepared.exceptionOrNull()?.message}") }
+                    return@launch
+                }
+                aiInputPath
+            } else inputForCommand
             val finalCmd = if (cpuForced) {
-                val base = cmd.replace("input.png", inputForCommand)
-                    .replace("output.png", outputPath)
+                val base = selectedCmd.replace("input.png", preparedInput)
+                    .replace("output.png", aiOutputPath)
                 "$base -g -1"
             } else {
-                cmd.replace("input.png", inputForCommand)
-                    .replace("output.png", outputPath)
+                selectedCmd.replace("input.png", preparedInput)
+                    .replace("output.png", aiOutputPath)
             }
 
             if (cpuForced) {
@@ -286,8 +332,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             // Check cache
             val cacheKey = UpscaleCache.buildKey(
                 (state.inputUri?.toString() ?: inputFile),
-                cmd,
-                4
+                "$cmd|strength=$aiStrength",
+                targetScale
             )
             val cached = UpscaleCache.get(cacheKey)
             if (cached != null && File(cached).exists()) {
@@ -304,6 +350,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             DebugLog.log("Cache", "MISS: $cacheKey")
 
             progressLogHelper.reset()
+            var lastUiProgressUpdate = 0L
             _uiState.update {
                 it.copy(
                     isProcessing = true,
@@ -314,12 +361,32 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 )
             }
 
+            if (aiStrength == 0) {
+                val baselineResult = withContext(Dispatchers.IO) {
+                    NaturalBlendProcessor.render(inputForCommand, null, outputPath, 0, targetScale)
+                }
+                val fileOk = baselineResult.isSuccess && File(outputPath).length() > 0
+                if (fileOk) UpscaleCache.put(cacheKey, outputPath)
+                _uiState.update {
+                    it.copy(
+                        isProcessing = false,
+                        statusMessage = if (fileOk) "Complete!" else
+                            "Failed: ${baselineResult.exceptionOrNull()?.message ?: "cannot create result"}",
+                        outputImageExists = fileOk
+                    )
+                }
+                return@launch
+            }
+
             imageProcessor.executeCommand(
                 command = finalCmd,
                 workingDir = app.workDir,
                 callback = object : ImageProcessor.ProcessCallback {
                     override fun onProgress(line: String) {
                         progressLogHelper.appendLine(line)
+                        val now = System.currentTimeMillis()
+                        if (now - lastUiProgressUpdate < 250L) return
+                        lastUiProgressUpdate = now
                         _uiState.update {
                             it.copy(
                                 logText = progressLogHelper.displayText,
@@ -329,7 +396,19 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     }
 
                     override fun onCompleted(result: String, success: Boolean) {
-                        if (success) {
+                        val blendResult = if (success) {
+                            NaturalBlendProcessor.render(
+                                inputPath = inputForCommand,
+                                aiPath = aiOutputPath,
+                                outputPath = outputPath,
+                                aiStrength = aiStrength,
+                                scale = targetScale
+                            )
+                        } else null
+                        File(aiOutputPath).delete()
+                        File(aiInputPath).delete()
+                        val finalSuccess = success && blendResult?.isSuccess == true
+                        if (finalSuccess) {
                             UpscaleCache.put(cacheKey, outputPath)
                             DebugLog.log("Cache", "Stored: $cacheKey -> $outputPath")
                         }
@@ -341,14 +420,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                             DebugLog.log("Output", "File OK: ${outFile.length()} bytes")
                         }
                         val summary = progressLogHelper.getCompletionSummary(
-                            success,
+                            finalSuccess,
                             isNcnnCommand = true
                         )
+                        val failureReason = result.lineSequence()
+                            .map { it.trim() }
+                            .filter { it.isNotBlank() }
+                            .lastOrNull()
+                            ?.take(160)
+                        val blendFailure = blendResult?.exceptionOrNull()?.message
                         _uiState.update {
                             it.copy(
                                 isProcessing = false,
                                 logText = progressLogHelper.displayText + summary,
-                                statusMessage = if (!success) "Failed!"
+                                statusMessage = if (!finalSuccess) "Failed: ${blendFailure ?: failureReason ?: "unknown engine error"}"
                                     else if (!fileOk) "Failed: output file is empty"
                                     else "Complete!",
                                 outputImageExists = fileOk
@@ -367,6 +452,28 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
             )
         }
+    }
+
+    private fun validateCommandAssets(command: String, workDir: String): String? {
+        val parts = command.trim().split("\\s+".toRegex())
+        val binary = parts.firstOrNull()?.removePrefix("./")
+            ?: return "Invalid processing command"
+        if (!File(workDir, binary).isFile) {
+            return "Engine is missing: $binary"
+        }
+
+        val modelIndex = parts.indexOf("-m")
+        if (modelIndex >= 0 && modelIndex + 1 < parts.size) {
+            val model = File(workDir, parts[modelIndex + 1])
+            if (!model.exists()) return "Model is missing: ${model.name}"
+            if (model.isDirectory) {
+                val hasWeights = model.listFiles()?.any {
+                    it.isFile && (it.extension.equals("bin", true) || it.extension.equals("mnn", true))
+                } == true
+                if (!hasWeights) return "Model weights are missing: ${model.name}"
+            }
+        }
+        return null
     }
 
     fun cancelProcessing() {

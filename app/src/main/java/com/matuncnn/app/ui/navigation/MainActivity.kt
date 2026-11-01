@@ -27,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -162,10 +163,10 @@ fun MatUnCnnNavHost(
                         icon = {
                             Icon(
                                 imageVector = if (selected) screen.selectedIcon else screen.unselectedIcon,
-                                contentDescription = screen.title
+                                contentDescription = stringResource(screen.titleRes)
                             )
                         },
-                        label = { if (selected) Text(screen.title) else null },
+                        label = { if (selected) Text(stringResource(screen.titleRes)) else null },
                         selected = selected,
                         onClick = {
                             navController.navigate(screen.route) {

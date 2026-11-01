@@ -7,9 +7,9 @@ import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 
-sealed class Screen(val route: String, val title: String, val selectedIcon: ImageVector, val unselectedIcon: ImageVector) {
-    data object Home : Screen("home", "Улучшение", Icons.Filled.Image, Icons.Outlined.Image)
-    data object Settings : Screen("settings", "Настройки", Icons.Filled.Settings, Icons.Outlined.Settings)
+sealed class Screen(val route: String, val titleRes: Int, val selectedIcon: ImageVector, val unselectedIcon: ImageVector) {
+    data object Home : Screen("home", com.matuncnn.app.R.string.nav_home, Icons.Filled.Image, Icons.Outlined.Image)
+    data object Settings : Screen("settings", com.matuncnn.app.R.string.nav_settings, Icons.Filled.Settings, Icons.Outlined.Settings)
 
     companion object {
         val items = listOf(Home, Settings)

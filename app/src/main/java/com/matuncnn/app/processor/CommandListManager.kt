@@ -22,16 +22,13 @@ class CommandListManager(
         val extraCmdList = mutableListOf<String>()
         val extraCmdLabels = buildExtraCommands(extraPath, extraCommand, classicalFilters, magickFilters, extraCmdList)
 
-        val l = 1
-        commandList = Array(extraCmdList.size + l) { i ->
-            if (i < l) COMMAND_0[i] else extraCmdList[i - l]
-        }
+        val l = COMMAND_0.size
+        commandList = COMMAND_0.copyOf()
 
-        defaultLabels = Array(extraCmdLabels.size + l) { i ->
+        defaultLabels = Array(l) { i ->
             when {
                 i < presetLabels.size.coerceAtMost(l) -> presetLabels[i]
-                i < l -> commandFingerprint(COMMAND_0[i])
-                else -> extraCmdLabels[i - l]
+                else -> commandFingerprint(COMMAND_0[i])
             }
         }
     }
@@ -132,43 +129,9 @@ class CommandListManager(
 
         val COMMAND_0 = arrayOf(
             "./realsr-ncnn -i input.png -o output.png -m models-Real-ESRGAN -s 4",
-            "./realsr-ncnn -i input.png -o output.png  -m models-Real-ESRGAN",
-            "./realsr-ncnn -i input.png -o output.png  -m models-Real-ESRGANv3-general -s 4",
-            "./realsr-ncnn -i input.png -o output.png  -m models-Real-ESRGANv3-anime -s 2",
-            "./realsr-ncnn -i input.png -o output.png  -m models-Real-ESRGANv3-anime -s 3",
-            "./realsr-ncnn -i input.png -o output.png  -m models-Real-ESRGANv3-anime -s 4",
-            "./realsr-ncnn -i input.png -o output.png  -m models-Real-ESRGANv2-anime -s 2",
-            "./realsr-ncnn -i input.png -o output.png  -m models-Real-ESRGANv2-anime -s 4",
-            "./mnnsr-ncnn -i input.png -o output.png  -m models-MNN/ESRGAN-MoeSR-jp_Illustration-x4.mnn -s 4",
-            "./mnnsr-ncnn -i input.png -o output.png  -m models-MNN/ESRGAN-MoeSR-jp_Illustration-x4.mnn -d 0 -s 4",
-            "./realsr-ncnn -i input.png -o output.png  -m models-ESRGAN-Nomos8kSC -s 4",
-            "./mnnsr-ncnn -i input.png -o output.png  -m models-MNN/ESRGAN-Nomos8kSC-x4.mnn -s 4",
-            "./realsr-ncnn -i input.png -o output.png  -m models-Real-ESRGAN-SourceBook -s 2",
-            "./realcugan-ncnn -i input.png -o output.png  -m models-nose -s 2  -n 0",
-            "./realcugan-ncnn -i input.png -o output.png  -m models-se -s 2  -n -1",
-            "./realcugan-ncnn -i input.png -o output.png  -m models-se -s 2  -n 0",
-            "./realcugan-ncnn -i input.png -o output.png  -m models-se -s 2  -n 1",
-            "./realcugan-ncnn -i input.png -o output.png  -m models-se -s 2  -n 2",
-            "./realcugan-ncnn -i input.png -o output.png  -m models-se -s 2  -n 3",
-            "./realcugan-ncnn -i input.png -o output.png  -m models-se -s 4  -n -1",
-            "./realcugan-ncnn -i input.png -o output.png  -m models-se -s 4  -n 0",
-            "./realcugan-ncnn -i input.png -o output.png  -m models-se -s 4  -n 3",
-            "./realcugan-ncnn -i input.png -o output.png  -m models-pro -s 2  -n -1",
-            "./realcugan-ncnn -i input.png -o output.png  -m models-pro -s 2  -n 0",
-            "./realcugan-ncnn -i input.png -o output.png  -m models-pro -s 2  -n 3",
-            "./realcugan-ncnn -i input.png -o output.png  -m models-pro -s 3  -n -1",
-            "./realcugan-ncnn -i input.png -o output.png  -m models-pro -s 3  -n 0",
-            "./realcugan-ncnn -i input.png -o output.png  -m models-pro -s 3  -n 3",
-            "./Anime4k -i input.png -o output.png -z 2 -A",
-            "./Anime4k -i input.png -o output.png -z 2 -A -a -e 48",
-            "./Anime4k -i input.png -o output.png -z 2 -A -b -r 48",
-            "./Anime4k -i input.png -o output.png -z 2 -A -w",
-            "./Anime4k -i input.png -o output.png -z 2 -A -w -H",
-            "./Anime4k -i input.png -o output.png -z 4 -A ",
-            "./Anime4k -i input.png -o output.png -z 4 -A -a -e 40",
-            "./Anime4k -i input.png -o output.png -z 4 -A -b -r 40",
-            "./Anime4k -i input.png -o output.png -z 4 -A -w",
-            "./Anime4k -i input.png -o output.png -z 4 -A -w -H",
+            "./realsr-ncnn -i input.png -o output.png -m models-Real-ESRGAN -s 4",
+            "./realsr-ncnn -i input.png -o output.png -m models-Real-ESRGAN -s 4",
+            "./realsr-ncnn -i input.png -o output.png -m models-Real-ESRGAN -s 4"
         )
 
         fun supportsDirectoryMode(command: String?): Boolean {

@@ -72,6 +72,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -119,7 +120,7 @@ fun HomeScreen(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Loading assets...", style = MaterialTheme.typography.bodyMedium)
+                Text(stringResource(com.matuncnn.app.R.string.preparing_engines), style = MaterialTheme.typography.bodyMedium)
             }
         }
         return
@@ -132,14 +133,21 @@ fun HomeScreen(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item(key = "header") {
-                Text("Upscale", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+                Column {
+                    Text("PhotoForge", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+                    Text(
+                        stringResource(com.matuncnn.app.R.string.home_subtitle),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
 
             item(key = "image_select") { ImageSelectionCard(state, onLaunchImagePicker) }
 
             item(key = "model_divider") { HorizontalDivider() }
 
-            item(key = "model_select") { CommandSelectorCard(state, viewModel) }
+            item(key = "recovery_presets") { RecoveryPresetsCard(state, viewModel) }
 
             item(key = "run_button") {
                 Button(
@@ -154,11 +162,11 @@ fun HomeScreen(
                             strokeWidth = 2.dp
                         )
                         Spacer(Modifier.width(8.dp))
-                        Text("Processing...")
+                        Text(stringResource(com.matuncnn.app.R.string.restoring))
                     } else {
                         Icon(Icons.Filled.PlayArrow, null, Modifier.size(20.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("Run", style = MaterialTheme.typography.titleMedium)
+                        Text(stringResource(com.matuncnn.app.R.string.improve_photo), style = MaterialTheme.typography.titleMedium)
                     }
                 }
             }
@@ -188,14 +196,14 @@ fun HomeScreen(
                     ) {
                         Icon(Icons.Filled.Stop, null, Modifier.size(18.dp))
                         Spacer(Modifier.width(6.dp))
-                        Text("Stop")
+                        Text(stringResource(com.matuncnn.app.R.string.stop_processing))
                     }
                 }
             }
 
             if (!state.hasVulkan) {
                 item(key = "vulkan_warning") {
-                    Text("Vulkan is not available. ncnn may not work.",
+                    Text(stringResource(com.matuncnn.app.R.string.vulkan_unavailable),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error)
                 }
@@ -217,7 +225,7 @@ fun HomeScreen(
                             Icon(Icons.Filled.Warning, null, Modifier.size(20.dp),
                                 tint = MaterialTheme.colorScheme.onErrorContainer)
                             Spacer(Modifier.width(8.dp))
-                            Text("Snapdragon detected — using CPU mode for compatibility",
+                            Text(stringResource(com.matuncnn.app.R.string.cpu_compatibility_notice),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onErrorContainer)
                         }
@@ -228,7 +236,7 @@ fun HomeScreen(
             item(key = "output_header") {
                 HorizontalDivider()
                 Spacer(Modifier.height(4.dp))
-                Text("Output", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Text(stringResource(com.matuncnn.app.R.string.result_title), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             }
 
             if (state.outputImageExists && state.outputFilePath != null) {
@@ -251,6 +259,61 @@ fun HomeScreen(
     }
 }
 
+@Composable
+private fun RecoveryPresetsCard(state: MainUiState, viewModel: MainViewModel) {
+    val profiles = listOf(
+        Triple(stringResource(com.matuncnn.app.R.string.profile_no_ai), 0, stringResource(com.matuncnn.app.R.string.profile_no_ai_desc)),
+        Triple(stringResource(com.matuncnn.app.R.string.profile_soft), 1, stringResource(com.matuncnn.app.R.string.profile_soft_desc)),
+        Triple(stringResource(com.matuncnn.app.R.string.profile_balance), 2, stringResource(com.matuncnn.app.R.string.profile_balance_desc)),
+        Triple(stringResource(com.matuncnn.app.R.string.profile_max), 3, stringResource(com.matuncnn.app.R.string.profile_max_desc))
+    )
+
+    OutlinedCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(modifier = Modifier.padding(14.dp)) {
+            Text(
+                stringResource(com.matuncnn.app.R.string.recovery_strength),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(Modifier.height(10.dp))
+            profiles.chunked(2).forEach { rowProfiles ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    rowProfiles.forEach { (label, index, _) ->
+                        val selected = state.selectedCommandIndex == index
+                        if (selected) {
+                            Button(
+                                onClick = { viewModel.selectCommand(index) },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(10.dp)
+                            ) { Text(label) }
+                        } else {
+                            OutlinedButton(
+                                onClick = { viewModel.selectCommand(index) },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(10.dp)
+                            ) { Text(label) }
+                        }
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+            }
+            val description = profiles.firstOrNull { it.second == state.selectedCommandIndex }?.third
+                ?: stringResource(com.matuncnn.app.R.string.professional_profile)
+            Text(
+                description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
 // ─── Image Selection ─────────────────────────────────────────────
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -269,7 +332,7 @@ fun ImageSelectionCard(state: MainUiState, onSelectImage: () -> Unit) {
                     Icon(Icons.Filled.ImageSearch, null, Modifier.size(36.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     Spacer(Modifier.height(6.dp))
-                    Text("Select an image to upscale",
+                    Text(stringResource(com.matuncnn.app.R.string.select_photo),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
@@ -297,10 +360,10 @@ fun ImageSelectionCard(state: MainUiState, onSelectImage: () -> Unit) {
                 Column(Modifier.weight(1f)) {
                     Text(state.inputFileName, style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text("Ready", style = MaterialTheme.typography.bodySmall,
+                    Text(stringResource(com.matuncnn.app.R.string.ready_processing), style = MaterialTheme.typography.bodySmall,
                         color = AppColors.statusSuccess)
                 }
-                OutlinedButton(onClick = onSelectImage) { Text("Change") }
+                OutlinedButton(onClick = onSelectImage) { Text(stringResource(com.matuncnn.app.R.string.change_photo)) }
             }
         }
     }
@@ -318,13 +381,13 @@ fun CommandSelectorCard(state: MainUiState, viewModel: MainViewModel) {
     val selectedLabel by remember(commands, state.selectedCommandIndex) {
         derivedStateOf {
             if (state.selectedCommandIndex in commands.indices)
-                commands[state.selectedCommandIndex].displayLabel else "Select model"
+                commands[state.selectedCommandIndex].displayLabel else "Выберите режим"
         }
     }
 
     Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Model", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold,
+            Text("Расширенный выбор модели", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.weight(1f))
         }
         Spacer(Modifier.height(8.dp))
@@ -455,7 +518,7 @@ fun OutputActionsRow(
         ) {
             Icon(Icons.Filled.Download, null, Modifier.size(16.dp))
             Spacer(Modifier.width(4.dp))
-            Text("Save to Gallery")
+            Text(stringResource(com.matuncnn.app.R.string.save_to_gallery))
         }
         OutlinedButton(
             onClick = { viewModel.shareOutput() },
@@ -489,7 +552,7 @@ fun EmptyOutputPlaceholder() {
             Icon(Icons.Filled.Image, null, Modifier.size(40.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
             Spacer(Modifier.height(8.dp))
-            Text("Your upscaled image will appear here",
+            Text(stringResource(com.matuncnn.app.R.string.result_placeholder),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center)
@@ -512,7 +575,7 @@ fun LogCard(
             Text("Log", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.weight(1f))
             IconButton(onClick = { saver.launch("matuncnn_log.txt") }) {
-                Icon(Icons.Filled.Download, "Save log", Modifier.size(20.dp))
+                Icon(Icons.Filled.Download, stringResource(com.matuncnn.app.R.string.save_log), Modifier.size(20.dp))
             }
         }
         Spacer(Modifier.height(8.dp))
@@ -524,7 +587,7 @@ fun LogCard(
                 .verticalScroll(rememberScrollState())
         ) {
             if (state.logText.isBlank()) {
-                Text("No output yet.",
+                Text(stringResource(com.matuncnn.app.R.string.no_output),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant)
             } else {

@@ -20,13 +20,20 @@ object AssetsDownloader {
 
     private const val RELEASE_URL = "https://github.com/Celesth/MatUnCNN/releases/download/v1.0.0-beta/realsr-assets-v1.0.0-beta.zip"
 
+    private val REQUIRED_ASSETS = listOf(
+        "realsr-ncnn",
+        "libncnn.so",
+        "models-Real-ESRGAN/x4.bin"
+    )
+
     suspend fun needsDownload(workDir: String): Boolean {
         return withContext(Dispatchers.IO) {
             val dir = File(workDir)
             if (!dir.exists() || !dir.isDirectory) return@withContext true
-            val contents = dir.listFiles()
-            if (contents.isNullOrEmpty()) return@withContext true
-            contents.any { it.isFile && !it.name.endsWith(".param") && !it.name.endsWith(".xml") }.not()
+            REQUIRED_ASSETS.any { relativePath ->
+                val file = File(dir, relativePath)
+                !file.isFile || file.length() == 0L
+            }
         }
     }
 

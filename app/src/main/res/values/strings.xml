@@ -1,12 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">PhotoForge</string>
+    <string name="home_subtitle">Photo restoration · Real-ESRGAN · offline</string>
+    <string name="preparing_engines">Preparing engines…</string>
+    <string name="select_photo">Select a photo</string>
+    <string name="ready_processing">Ready to process</string>
+    <string name="change_photo">Change</string>
+    <string name="recovery_strength">RESTORATION STRENGTH</string>
+    <string name="profile_no_ai">No AI</string>
+    <string name="profile_soft">Soft</string>
+    <string name="profile_balance">Balance</string>
+    <string name="profile_max">Maximum</string>
+    <string name="profile_no_ai_desc">Fast high-quality resizing without redrawing</string>
+    <string name="profile_soft_desc">20% AI · preserves the source as much as possible</string>
+    <string name="profile_balance_desc">35% AI · balanced cleanup and natural detail</string>
+    <string name="profile_max_desc">50% AI · stronger restoration without full redrawing</string>
+    <string name="improve_photo">Improve photo</string>
+    <string name="restoring">Restoring…</string>
+    <string name="stop_processing">Stop</string>
+    <string name="result_title">Result</string>
+    <string name="result_placeholder">Your improved photo will appear here</string>
+    <string name="save_to_gallery">Save to gallery</string>
+    <string name="save_log">Save log</string>
+    <string name="no_output">No result yet</string>
+    <string name="vulkan_unavailable">Vulkan is unavailable. AI processing may not work.</string>
+    <string name="cpu_compatibility_notice">Compatibility CPU mode is enabled</string>
+    <string name="professional_profile">Professional recovery profile</string>
+    <string name="nav_home">Enhance</string>
+    <string name="nav_settings">Settings</string>
+    <string name="settings_title">Settings</string>
+    <string name="language_title">Application language</string>
+    <string name="lang_system">System default</string>
+    <string name="performance_title">Performance</string>
+    <string name="tile_size_label">Tile size (0 = automatic)</string>
+    <string name="auto_save_results">Save results automatically</string>
+    <string name="cpu_mode">CPU compatibility mode</string>
+    <string name="github_button">GitHub · OlegBawq</string>
+    <string name="telegram_button">Telegram · @niix3</string>
+    <string name="source_button">PhotoForge source code</string>
     <string name="default_log">\n
         MatUnCNN - Image &amp; Video Upscaling with nCNN\n
         \nThis application bundles nCNN-based super-resolution tools
         and FFmpeg for video processing.\n
         \nIt does not collect any private information.\n
-        \nGithub: https://github.com/tumuyan/RealSR-NCNN-Android
+        \nАвтор: https://github.com/OlegBawq · Telegram: @niix3
+        \nИсходники: https://github.com/OlegBawq/PhotoUpscaling
     </string>
     <string name="input_command">Input console command, for example: ./realsr-ncnn -i input.png -o output.png</string>
     <string name="open">Open</string>
@@ -79,43 +117,9 @@
 
     <!-- Style arrays for command labels -->
     <string-array name="style_array">
-        <item>Real-ESRGAN-anime</item>
-        <item>Real-ESRGAN</item>
-        <item>Real-ESRGANv3-general-x4</item>
-        <item>Real-ESRGANv3-anime-x2</item>
-        <item>Real-ESRGANv3-anime-x3</item>
-        <item>Real-ESRGANv3-anime-x4</item>
-        <item>Real-ESRGANv2-anime-x2</item>
-        <item>Real-ESRGANv2-anime-x4</item>
-        <item>MNNSR-MoeSR-x4</item>
-        <item>MNNSR-MoeSR-x4-GPU</item>
-        <item>ESRGAN-Nomos8kSC-x4</item>
-        <item>MNNSR-Nomos8kSC-x4</item>
-        <item>Real-ESRGAN-SourceBook-x2</item>
-        <item>RealCUGAN-nose-x2</item>
-        <item>RealCUGAN-se-x2-n-1</item>
-        <item>RealCUGAN-se-x2-n0</item>
-        <item>RealCUGAN-se-x2-n1</item>
-        <item>RealCUGAN-se-x2-n2</item>
-        <item>RealCUGAN-se-x2-n3</item>
-        <item>RealCUGAN-se-x4-n-1</item>
-        <item>RealCUGAN-se-x4-n0</item>
-        <item>RealCUGAN-se-x4-n3</item>
-        <item>RealCUGAN-pro-x2-n-1</item>
-        <item>RealCUGAN-pro-x2-n0</item>
-        <item>RealCUGAN-pro-x2-n3</item>
-        <item>RealCUGAN-pro-x3-n-1</item>
-        <item>RealCUGAN-pro-x3-n0</item>
-        <item>RealCUGAN-pro-x3-n3</item>
-        <item>Anime4K-x2</item>
-        <item>Anime4K-x2-A</item>
-        <item>Anime4K-x2-B</item>
-        <item>Anime4K-x2-W</item>
-        <item>Anime4K-x2-WH</item>
-        <item>Anime4K-x4</item>
-        <item>Anime4K-x4-A</item>
-        <item>Anime4K-x4-B</item>
-        <item>Anime4K-x4-W</item>
-        <item>Anime4K-x4-WH</item>
+        <item>Мягко · 2×</item>
+        <item>Баланс · 4×</item>
+        <item>Максимум · 4×</item>
+        <item>Аниме · 2×</item>
     </string-array>
 </resources>

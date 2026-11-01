@@ -1,12 +1,20 @@
 # PhotoForge для Android
 
-Улучшение фотографий на устройстве с Real-ESRGAN 4×. Интерфейс PhotoForge
-использует тёмную палитру с синими акцентами. Выпуск 1.1.1 подписывается
-отдельным ключом, который не хранится в репозитории.
+Офлайн-восстановление и апскейл фотографий на устройстве. Версия 1.2.0
+получила интерфейс в стиле PhotoForge 2.0 и один проверенный ARM64-движок
+Real-ESRGAN. Результат нейросети мягко смешивается с исходником, чтобы не
+перерисовывать лицо, тело и мелкие формы. Выпуск подписывается отдельным
+ключом, который не хранится в репозитории.
 
-Скачать: [Android APK](dist/PhotoForge-Android-v1.1.1.apk) ·
+Скачать: [Android APK 1.2.0](dist/PhotoForge-Android-v1.2.0.apk) ·
 [Windows x64](dist/PhotoForge-Windows-x64.zip).
 Windows-версия находится в ZIP: распакуйте архив и запустите `PhotoForge.exe`.
+
+Автор: [OlegBawq](https://github.com/OlegBawq) · Telegram: [@niix3](https://t.me/niix3)
+
+Четыре профиля: без ИИ, мягкий (20%), баланс (35%) и максимум (50%). Для
+маленьких повреждённых изображений используется x4, для более крупных —
+автоматически более лёгкий режим с ограничением результата до 20 МП.
 
 Проект основан на [MatUnCNN](https://github.com/Celesth/MatUnCNN), который
 использует [RealSR-NCNN-Android](https://github.com/tumuyan/RealSR-NCNN-Android)
@@ -63,9 +71,9 @@ Android native image upscaler powered by [ncnn](https://github.com/Tencent/ncnn)
 
 ## Installation
 
-Download the latest APK from the [Releases](https://github.com/Celesth/MatUnCNN/releases) page and install it.
+Download the latest APK from the [PhotoForge Releases](https://github.com/OlegBawq/PhotoUpscaling/releases) page and install it.
 
-Model assets are downloaded automatically on first launch.
+The signed APK contains the compatible ARM64 engines and model weights and works offline.
 
 ---
 
