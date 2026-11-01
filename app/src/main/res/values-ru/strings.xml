@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">PhotoForge</string>
     <string name="home_subtitle">Восстановление фотографий · Real-ESRGAN · офлайн</string>
     <string name="preparing_engines">Подготовка движков…</string>
     <string name="select_photo">Выбрать фотографию</string>
@@ -11,9 +12,9 @@
     <string name="profile_balance">Баланс</string>
     <string name="profile_max">Максимум</string>
     <string name="profile_no_ai_desc">Быстрое качественное увеличение без перерисовки</string>
-    <string name="profile_soft_desc">20% ИИ · максимально сохраняет оригинал</string>
-    <string name="profile_balance_desc">35% ИИ · баланс очистки и естественности</string>
-    <string name="profile_max_desc">50% ИИ · усиленное восстановление без полной перерисовки</string>
+    <string name="profile_soft_desc" formatted="false">20% ИИ · максимально сохраняет оригинал</string>
+    <string name="profile_balance_desc" formatted="false">35% ИИ · баланс очистки и естественности</string>
+    <string name="profile_max_desc" formatted="false">50% ИИ · усиленное восстановление без полной перерисовки</string>
     <string name="improve_photo">Улучшить фото</string>
     <string name="restoring">Восстановление…</string>
     <string name="stop_processing">Остановить</string>
@@ -22,8 +23,6 @@
     <string name="save_to_gallery">Сохранить в галерею</string>
     <string name="save_log">Сохранить журнал</string>
     <string name="no_output">Результата пока нет</string>
-    <string name="vulkan_unavailable">Vulkan недоступен. ИИ-обработка может не работать.</string>
-    <string name="cpu_compatibility_notice">Включён совместимый режим CPU</string>
     <string name="professional_profile">Профессиональный профиль восстановления</string>
     <string name="nav_home">Улучшение</string>
     <string name="nav_settings">Настройки</string>
@@ -33,8 +32,9 @@
     <string name="performance_title">Производительность</string>
     <string name="tile_size_label">Размер блока (0 = автоматически)</string>
     <string name="auto_save_results">Сохранять результат автоматически</string>
-    <string name="cpu_mode">Режим совместимости CPU</string>
     <string name="github_button">GitHub · OlegBawq</string>
     <string name="telegram_button">Telegram · @niix3</string>
     <string name="source_button">Исходный код PhotoForge</string>
+    <string name="default_classical_filters">ближайший</string>
+    <string name="default_magick_filters">Ланцош</string>
 </resources>

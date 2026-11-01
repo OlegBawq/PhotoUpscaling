@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">PhotoForge</string>
     <string name="home_subtitle">Fotowiederherstellung · Real-ESRGAN · offline</string>
     <string name="preparing_engines">Engines werden vorbereitet…</string>
     <string name="select_photo">Foto auswählen</string>
@@ -11,13 +12,18 @@
     <string name="profile_balance">Ausgewogen</string>
     <string name="profile_max">Maximum</string>
     <string name="profile_no_ai_desc">Schnelle hochwertige Skalierung ohne Neuzeichnen</string>
-    <string name="profile_soft_desc">20% KI · bewahrt das Original maximal</string>
-    <string name="profile_balance_desc">35% KI · natürliche, ausgewogene Reinigung</string>
-    <string name="profile_max_desc">50% KI · stärkere Wiederherstellung ohne Neuzeichnen</string>
+    <string name="profile_soft_desc" formatted="false">20% KI · bewahrt das Original maximal</string>
+    <string name="profile_balance_desc" formatted="false">35% KI · natürliche, ausgewogene Reinigung</string>
+    <string name="profile_max_desc" formatted="false">50% KI · stärkere Wiederherstellung ohne Neuzeichnen</string>
     <string name="improve_photo">Foto verbessern</string>
     <string name="restoring">Wiederherstellung…</string>
     <string name="stop_processing">Stoppen</string>
     <string name="result_title">Ergebnis</string>
+    <string name="result_placeholder">Das verbesserte Foto erscheint hier</string>
+    <string name="save_to_gallery">In Galerie speichern</string>
+    <string name="save_log">Protokoll speichern</string>
+    <string name="no_output">Noch kein Ergebnis</string>
+    <string name="professional_profile">Professionelles Wiederherstellungsprofil</string>
     <string name="nav_home">Verbessern</string>
     <string name="nav_settings">Einstellungen</string>
     <string name="settings_title">Einstellungen</string>
@@ -26,8 +32,9 @@
     <string name="performance_title">Leistung</string>
     <string name="tile_size_label">Kachelgröße (0 = automatisch)</string>
     <string name="auto_save_results">Ergebnisse automatisch speichern</string>
-    <string name="cpu_mode">CPU-Kompatibilitätsmodus</string>
     <string name="github_button">GitHub · OlegBawq</string>
     <string name="telegram_button">Telegram · @niix3</string>
     <string name="source_button">PhotoForge-Quellcode</string>
+    <string name="default_classical_filters">nächster</string>
+    <string name="default_magick_filters">Lanczos</string>
 </resources>

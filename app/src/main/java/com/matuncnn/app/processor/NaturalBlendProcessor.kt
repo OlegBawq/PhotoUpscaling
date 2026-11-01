@@ -3,12 +3,14 @@ package com.matuncnn.app.processor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
+import android.graphics.ImageDecoder
 import android.graphics.Paint
+import android.os.Build
 import java.io.File
 import java.io.FileOutputStream
 
 object NaturalBlendProcessor {
-    private const val MAX_OUTPUT_PIXELS = 20_000_000L
+    private const val MAX_OUTPUT_PIXELS = 12_000_000L
 
     fun recommendedScale(inputPath: String): Int {
         val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
@@ -24,7 +26,7 @@ object NaturalBlendProcessor {
 
     fun prepareAiInput(inputPath: String, outputPath: String, targetScale: Int): Result<Unit> =
         runCatching {
-            val source = BitmapFactory.decodeFile(inputPath)
+            val source = decodeBitmap(inputPath)
                 ?: error("Cannot decode the source image")
             val width = (source.width * targetScale / 4).coerceAtLeast(1)
             val height = (source.height * targetScale / 4).coerceAtLeast(1)
@@ -46,19 +48,19 @@ object NaturalBlendProcessor {
         aiStrength: Int,
         scale: Int = 4
     ): Result<Unit> = runCatching {
-        val source = BitmapFactory.decodeFile(inputPath)
+        val source = decodeBitmap(inputPath)
             ?: error("Cannot decode the source image")
         val targetWidth = source.width * scale
         val targetHeight = source.height * scale
         require(targetWidth.toLong() * targetHeight <= MAX_OUTPUT_PIXELS) {
-            "The result is larger than 20 megapixels"
+            "The result is larger than 12 megapixels"
         }
 
         val baseline = Bitmap.createScaledBitmap(source, targetWidth, targetHeight, true)
         val result = if (aiStrength <= 0 || aiPath == null) {
             baseline
         } else {
-            val aiSource = BitmapFactory.decodeFile(aiPath)
+            val aiSource = decodeBitmap(aiPath)
                 ?: error("Cannot decode the AI result")
             val ai = if (aiSource.width == targetWidth && aiSource.height == targetHeight) {
                 aiSource
@@ -86,5 +88,17 @@ object NaturalBlendProcessor {
         if (result !== baseline) result.recycle()
         baseline.recycle()
         source.recycle()
+    }
+
+    private fun decodeBitmap(path: String): Bitmap? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            runCatching {
+                ImageDecoder.decodeBitmap(ImageDecoder.createSource(File(path))) { decoder, _, _ ->
+                    decoder.allocator = ImageDecoder.ALLOCATOR_SOFTWARE
+                }
+            }.getOrNull()
+        } else {
+            BitmapFactory.decodeFile(path)
+        }
     }
 }

@@ -6,15 +6,14 @@ plugins {
 
 android {
     namespace = "com.matuncnn.app"
-    compileSdk = 36
-    ndkVersion = "27.2.12479018"
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.photoforge.app"
         minSdk = 24
         targetSdk = 34
-        versionCode = 6
-        versionName = "1.2.2"
+        versionCode = 7
+        versionName = "1.2.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         ndk { abiFilters += listOf("arm64-v8a") }
@@ -60,13 +59,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    externalNativeBuild {
-        cmake {
-            path = file("src/main/cpp/CMakeLists.txt")
-            version = "3.22.1"
-        }
-    }
-
     kotlinOptions {
         jvmTarget = "17"
     }
@@ -79,6 +71,12 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
+    bundle {
+        language {
+            enableSplit = false
         }
     }
 }

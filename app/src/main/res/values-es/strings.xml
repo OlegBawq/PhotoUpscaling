@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">PhotoForge</string>
     <string name="home_subtitle">Restauración de fotos · Real-ESRGAN · sin conexión</string>
     <string name="preparing_engines">Preparando motores…</string>
     <string name="select_photo">Seleccionar foto</string>
@@ -11,13 +12,18 @@
     <string name="profile_balance">Equilibrado</string>
     <string name="profile_max">Máximo</string>
     <string name="profile_no_ai_desc">Escalado rápido y de calidad sin redibujar</string>
-    <string name="profile_soft_desc">20% IA · conserva al máximo el original</string>
-    <string name="profile_balance_desc">35% IA · limpieza natural y equilibrada</string>
-    <string name="profile_max_desc">50% IA · restauración fuerte sin redibujar</string>
+    <string name="profile_soft_desc" formatted="false">20% IA · conserva al máximo el original</string>
+    <string name="profile_balance_desc" formatted="false">35% IA · limpieza natural y equilibrada</string>
+    <string name="profile_max_desc" formatted="false">50% IA · restauración fuerte sin redibujar</string>
     <string name="improve_photo">Mejorar foto</string>
     <string name="restoring">Restaurando…</string>
     <string name="stop_processing">Detener</string>
     <string name="result_title">Resultado</string>
+    <string name="result_placeholder">La foto mejorada aparecerá aquí</string>
+    <string name="save_to_gallery">Guardar en la galería</string>
+    <string name="save_log">Guardar registro</string>
+    <string name="no_output">Aún no hay resultado</string>
+    <string name="professional_profile">Perfil profesional de restauración</string>
     <string name="nav_home">Mejorar</string>
     <string name="nav_settings">Ajustes</string>
     <string name="settings_title">Ajustes</string>
@@ -26,8 +32,9 @@
     <string name="performance_title">Rendimiento</string>
     <string name="tile_size_label">Tamaño de bloque (0 = automático)</string>
     <string name="auto_save_results">Guardar resultados automáticamente</string>
-    <string name="cpu_mode">Modo de compatibilidad CPU</string>
     <string name="github_button">GitHub · OlegBawq</string>
     <string name="telegram_button">Telegram · @niix3</string>
     <string name="source_button">Código fuente de PhotoForge</string>
+    <string name="default_classical_filters">más cercano</string>
+    <string name="default_magick_filters">Lanczos</string>
 </resources>

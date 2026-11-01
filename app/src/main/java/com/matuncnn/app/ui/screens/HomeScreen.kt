@@ -32,13 +32,11 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.ImageSearch
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -56,13 +54,13 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -86,7 +84,6 @@ import com.matuncnn.app.ui.theme.AppColors
 import com.matuncnn.app.viewmodel.MainUiState
 import com.matuncnn.app.viewmodel.MainViewModel
 import java.io.File
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,7 +93,6 @@ fun HomeScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
     val logSaver = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("text/plain")
@@ -106,11 +102,8 @@ fun HomeScreen(
         ActivityResultContracts.CreateDocument("image/png")
     ) { uri -> uri?.let { viewModel.saveOutputTo(it) } }
 
-    // Show snackbar on completion
-    val prevStatus = remember { mutableStateOf("") }
-    if (state.statusMessage.isNotBlank() && state.statusMessage != prevStatus.value && !state.isProcessing) {
-        prevStatus.value = state.statusMessage
-        scope.launch {
+    LaunchedEffect(state.statusMessage, state.isProcessing) {
+        if (state.statusMessage.isNotBlank() && !state.isProcessing) {
             snackbarHostState.showSnackbar(state.statusMessage)
         }
     }
@@ -197,38 +190,6 @@ fun HomeScreen(
                         Icon(Icons.Filled.Stop, null, Modifier.size(18.dp))
                         Spacer(Modifier.width(6.dp))
                         Text(stringResource(com.matuncnn.app.R.string.stop_processing))
-                    }
-                }
-            }
-
-            if (!state.hasVulkan) {
-                item(key = "vulkan_warning") {
-                    Text(stringResource(com.matuncnn.app.R.string.vulkan_unavailable),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error)
-                }
-            }
-
-            if (state.useCpuFallback) {
-                item(key = "cpu_fallback") {
-                    OutlinedCard(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.outlinedCardColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer
-                        )
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(Icons.Filled.Warning, null, Modifier.size(20.dp),
-                                tint = MaterialTheme.colorScheme.onErrorContainer)
-                            Spacer(Modifier.width(8.dp))
-                            Text(stringResource(com.matuncnn.app.R.string.cpu_compatibility_notice),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onErrorContainer)
-                        }
                     }
                 }
             }

@@ -7,6 +7,7 @@ import android.os.Environment
 import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.core.content.IntentCompat
 import com.matuncnn.app.MatUnCnnApp
 import com.matuncnn.app.data.AppSettings
 import com.matuncnn.app.data.SettingsRepository
@@ -20,7 +21,6 @@ import com.matuncnn.app.util.DownloadProgress
 import com.matuncnn.app.util.ProgressLogHelper
 import com.matuncnn.app.util.UpscaleCache
 import com.matuncnn.app.util.UriUtils
-import com.matuncnn.app.util.VulkanHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -56,9 +56,7 @@ data class MainUiState(
     val isMultipleFiles: Boolean = false,
     val selectedUris: List<Uri> = emptyList(),
     val downloadProgress: DownloadProgress? = null,
-    val hasVulkan: Boolean = true,
-    val scaleText: String = "",
-    val useCpuFallback: Boolean = false
+    val scaleText: String = ""
 )
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -111,18 +109,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             true
         }
         if (!ok) return
-
-        val hasVulkan = VulkanHelper.hasVulkan(context.packageManager)
-        DebugLog.log("Init", "Vulkan check: ${if (hasVulkan) "available" else "NOT available"}")
-        if (!hasVulkan) {
-            _uiState.update { it.copy(hasVulkan = false) }
-        }
-
-        val isAdreno = VulkanHelper.isAdrenoGpu()
-        DebugLog.log("Init", "GPU check: ${if (isAdreno) "Adreno detected, will force CPU" else "non-Adreno"}")
-        if (isAdreno) {
-            _uiState.update { it.copy(useCpuFallback = true) }
-        }
 
         val settings = settingsRepo.settingsFlow.first()
         val manager = withContext(Dispatchers.Default) {
@@ -183,13 +169,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         when {
             intent.action == Intent.ACTION_SEND && intent.type?.startsWith("image/") == true -> {
-                val imageUri = intent.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
+                val imageUri = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java)
                 if (imageUri != null) {
                     setInputImage(imageUri)
                 }
             }
             intent.action == Intent.ACTION_SEND_MULTIPLE && intent.type?.startsWith("image/") == true -> {
-                val uris = intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)
+                val uris = IntentCompat.getParcelableArrayListExtra(intent, Intent.EXTRA_STREAM, Uri::class.java)
                 if (!uris.isNullOrEmpty()) {
                     _uiState.update {
                         it.copy(isMultipleFiles = true, selectedUris = uris)
@@ -203,13 +189,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun setInputImage(uri: Uri) {
         viewModelScope.launch {
             val context = getApplication<Application>()
-            val path = UriUtils.getPathFromUri(uri, context)
             val fileName = UriUtils.getFileName(uri, context) ?: "image"
 
             _uiState.update {
                 it.copy(
                     inputUri = uri,
-                    inputFilePath = path ?: uri.toString(),
+                    inputFilePath = uri.toString(),
                     inputFileName = fileName,
                     inputImageExists = true,
                     outputFilePath = null,
@@ -269,12 +254,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             // Handle input file
             val inputForCommand: String
             if (state.inputUri != null) {
-                // Copy content URI to temp file
                 val tempInput = File(app.workDir, "input.png")
-                context.contentResolver.openInputStream(state.inputUri)?.use { input ->
-                    FileOutputStream(tempInput).use { output ->
-                        input.copyTo(output)
+                val copyResult = runCatching {
+                    tempInput.delete()
+                    val input = context.contentResolver.openInputStream(state.inputUri)
+                        ?: error("Cannot open the selected image")
+                    input.use {
+                        FileOutputStream(tempInput).use { output -> it.copyTo(output) }
                     }
+                    require(tempInput.length() > 0) { "The selected image is empty" }
+                }
+                if (copyResult.isFailure) {
+                    _uiState.update {
+                        it.copy(statusMessage = "Failed: ${copyResult.exceptionOrNull()?.message}")
+                    }
+                    return@launch
                 }
                 inputForCommand = tempInput.absolutePath
                 DebugLog.log("Input", "Copied content:// to $inputForCommand")
@@ -282,19 +276,25 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 inputForCommand = inputFile
             }
 
-            val defaultSaveDir = Environment.getExternalStorageDirectory()
-                .absolutePath + File.separator + Environment.DIRECTORY_DCIM + File.separator + "MatUnCNN"
-            val saveDir = if (state.settings.savePath.isNotBlank()) state.settings.savePath else defaultSaveDir
+            val privatePictures = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                ?: context.filesDir
+            val saveDir = File(privatePictures, "PhotoForge").absolutePath
             File(saveDir).mkdirs()
 
             val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
             val outputFileName = "upscaled_${timestamp}.png"
             val outputPath = "$saveDir/$outputFileName"
+            File(outputPath).delete()
             val aiStrength = listOf(0, 20, 35, 50)
                 .getOrElse(state.selectedCommandIndex) { 35 }
             val aiOutputPath = File(app.workDir, "ai_${timestamp}.png").absolutePath
             val aiInputPath = File(app.workDir, "ai_input_${timestamp}.png").absolutePath
-            val targetScale = NaturalBlendProcessor.recommendedScale(inputForCommand)
+            val targetScale = runCatching {
+                NaturalBlendProcessor.recommendedScale(inputForCommand)
+            }.getOrElse { error ->
+                _uiState.update { it.copy(statusMessage = "Failed: ${error.message}") }
+                return@launch
+            }
             val aiScale = when (targetScale) {
                 4 -> 2
                 2 -> 1
@@ -349,6 +349,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         statusMessage = "Complete! (cached)"
                     )
                 }
+                if (state.settings.autoSave) saveOutputToGallery()
                 return@launch
             }
             DebugLog.log("Cache", "MISS: $cacheKey")
@@ -379,6 +380,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         outputImageExists = fileOk
                     )
                 }
+                if (fileOk && state.settings.autoSave) saveOutputToGallery()
                 return@launch
             }
 
@@ -433,15 +435,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                             .lastOrNull()
                             ?.take(160)
                         val blendFailure = blendResult?.exceptionOrNull()?.message
+                        val cancelled = result.contains("Process cancelled")
                         _uiState.update {
                             it.copy(
                                 isProcessing = false,
                                 logText = progressLogHelper.displayText + summary,
-                                statusMessage = if (!finalSuccess) "Failed: ${blendFailure ?: failureReason ?: "unknown engine error"}"
+                                statusMessage = if (cancelled) "Cancelled"
+                                    else if (!finalSuccess) "Failed: ${blendFailure ?: failureReason ?: "unknown engine error"}"
                                     else if (!fileOk) "Failed: output file is empty"
                                     else "Complete!",
-                                outputImageExists = fileOk
+                                outputImageExists = !cancelled && finalSuccess && fileOk
                             )
+                        }
+                        if (finalSuccess && fileOk && state.settings.autoSave) {
+                            saveOutputToGallery()
                         }
                     }
 
@@ -552,6 +559,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 val values = android.content.ContentValues().apply {
                     put(android.provider.MediaStore.Images.Media.DISPLAY_NAME, file.name)
                     put(android.provider.MediaStore.Images.Media.MIME_TYPE, "image/png")
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                        put(
+                            android.provider.MediaStore.Images.Media.RELATIVE_PATH,
+                            Environment.DIRECTORY_DCIM + File.separator + "PhotoForge"
+                        )
+                        put(android.provider.MediaStore.Images.Media.IS_PENDING, 1)
+                    }
                 }
                 val uri = context.contentResolver.insert(
                     android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values
@@ -559,6 +573,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 if (uri != null) {
                     context.contentResolver.openOutputStream(uri)?.use { out ->
                         file.inputStream().use { it.copyTo(out) }
+                    }
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                        values.clear()
+                        values.put(android.provider.MediaStore.Images.Media.IS_PENDING, 0)
+                        context.contentResolver.update(uri, values, null, null)
                     }
                     _uiState.update { it.copy(statusMessage = "Saved to Gallery!") }
                 }

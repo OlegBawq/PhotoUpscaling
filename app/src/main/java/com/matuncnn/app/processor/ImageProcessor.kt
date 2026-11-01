@@ -4,7 +4,6 @@ import android.util.Log
 import com.matuncnn.app.util.DebugLog
 import com.matuncnn.app.util.ExecHelper
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
@@ -13,7 +12,7 @@ import java.io.InputStreamReader
 
 class ImageProcessor {
     private var currentProcess: Process? = null
-    private var currentJob: Job? = null
+    @Volatile private var cancelRequested = false
 
     interface ProcessCallback {
         fun onProgress(line: String)
@@ -27,7 +26,9 @@ class ImageProcessor {
         extraSetup: String = "",
         callback: ProcessCallback
     ) = withContext(Dispatchers.IO) {
-        cancelCurrentTask()
+        currentProcess?.destroy()
+        currentProcess = null
+        cancelRequested = false
 
         val resultBuilder = StringBuilder()
         var success = false
@@ -93,20 +94,21 @@ class ImageProcessor {
             }
 
             val exitCode = currentProcess!!.waitFor()
-            success = exitCode == 0
+            success = exitCode == 0 && !cancelRequested
+            if (cancelRequested) resultBuilder.appendLine("Process cancelled")
             DebugLog.log("Upscale", "Finished: exit=$exitCode success=$success")
             Log.d("ImageProcessor", "Process finished with exit code: $exitCode")
         } catch (e: InterruptedException) {
             Log.w("ImageProcessor", "Process interrupted")
             DebugLog.log("Upscale", "Interrupted")
             resultBuilder.appendLine("Process interrupted")
-            callback.onError("Process interrupted")
+            if (!cancelRequested) callback.onError("Process interrupted")
         } catch (e: Exception) {
             Log.e("ImageProcessor", "Error executing process", e)
             DebugLog.log("Upscale", "Error: ${e.message}")
             val message = e.message ?: "Unknown error"
             resultBuilder.appendLine(message)
-            callback.onError(message)
+            if (!cancelRequested) callback.onError(message)
         } finally {
             currentProcess?.destroy()
             currentProcess = null
@@ -115,7 +117,7 @@ class ImageProcessor {
     }
 
     fun cancelCurrentTask() {
-        currentJob?.cancel()
+        cancelRequested = true
         currentProcess?.destroy()
         currentProcess = null
     }

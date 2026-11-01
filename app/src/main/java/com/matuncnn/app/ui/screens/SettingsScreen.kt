@@ -149,9 +149,6 @@ private fun GeneralTab(settings: AppSettings, viewModel: MainViewModel) {
                     SettingToggle(stringResource(com.matuncnn.app.R.string.auto_save_results), settings.autoSave) {
                         viewModel.updateSettings(settings.copy(autoSave = it))
                     }
-                    SettingToggle(stringResource(com.matuncnn.app.R.string.cpu_mode), settings.useCPU) {
-                        viewModel.updateSettings(settings.copy(useCPU = it))
-                    }
                 }
             }
         }

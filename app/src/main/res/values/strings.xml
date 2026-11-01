@@ -12,9 +12,9 @@
     <string name="profile_balance">Balance</string>
     <string name="profile_max">Maximum</string>
     <string name="profile_no_ai_desc">Fast high-quality resizing without redrawing</string>
-    <string name="profile_soft_desc">20% AI · preserves the source as much as possible</string>
-    <string name="profile_balance_desc">35% AI · balanced cleanup and natural detail</string>
-    <string name="profile_max_desc">50% AI · stronger restoration without full redrawing</string>
+    <string name="profile_soft_desc" formatted="false">20% AI · preserves the source as much as possible</string>
+    <string name="profile_balance_desc" formatted="false">35% AI · balanced cleanup and natural detail</string>
+    <string name="profile_max_desc" formatted="false">50% AI · stronger restoration without full redrawing</string>
     <string name="improve_photo">Improve photo</string>
     <string name="restoring">Restoring…</string>
     <string name="stop_processing">Stop</string>
@@ -23,8 +23,6 @@
     <string name="save_to_gallery">Save to gallery</string>
     <string name="save_log">Save log</string>
     <string name="no_output">No result yet</string>
-    <string name="vulkan_unavailable">Vulkan is unavailable. AI processing may not work.</string>
-    <string name="cpu_compatibility_notice">Compatibility CPU mode is enabled</string>
     <string name="professional_profile">Professional recovery profile</string>
     <string name="nav_home">Enhance</string>
     <string name="nav_settings">Settings</string>
@@ -34,86 +32,11 @@
     <string name="performance_title">Performance</string>
     <string name="tile_size_label">Tile size (0 = automatic)</string>
     <string name="auto_save_results">Save results automatically</string>
-    <string name="cpu_mode">CPU compatibility mode</string>
     <string name="github_button">GitHub · OlegBawq</string>
     <string name="telegram_button">Telegram · @niix3</string>
     <string name="source_button">PhotoForge source code</string>
-    <string name="default_log">\n
-        MatUnCNN - Image &amp; Video Upscaling with nCNN\n
-        \nThis application bundles nCNN-based super-resolution tools
-        and FFmpeg for video processing.\n
-        \nIt does not collect any private information.\n
-        \nАвтор: https://github.com/OlegBawq · Telegram: @niix3
-        \nИсходники: https://github.com/OlegBawq/PhotoUpscaling
-    </string>
-    <string name="input_command">Input console command, for example: ./realsr-ncnn -i input.png -o output.png</string>
-    <string name="open">Open</string>
-    <string name="run">Run</string>
-    <string name="save">Save</string>
-    <string name="setting">Settings</string>
-    <string name="done">Done</string>
-    <string name="busy">Busy</string>
-    <string name="default_select_command">Default command in the command list</string>
-    <string name="tile_size">Tile size for default command</string>
-    <string name="default_command">Preset command in the TextEditor</string>
-    <string name="save_setting">Save Setting</string>
-    <string name="save_succeed">Save Succeed!</string>
-    <string name="save_fail">Save Fail!</string>
-    <string name="threadCount">Load/Proc/Save thread count (default=1:2:2)</string>
-    <string name="reset">Reset default parameters</string>
-    <string name="reset_low">Reset compatible parameters</string>
-    <string name="thread_count_err">not number:number:number</string>
-    <string name="keep_screen">Keep screen on when processing</string>
-    <string name="extra_command">Extra command in the command list</string>
-    <string name="partners_for_preset_command">Partners for preset super-resolution command</string>
-    <string name="custom_command">Custom command</string>
-    <string name="use_cpu">NCNN use CPU forward backend</string>
-    <string name="save_format">Save format</string>
-    <string name="dir_output_format">Output format for batch processing</string>
-    <string name="general">General</string>
-    <string name="output_not_exits">Error: no file to export</string>
-    <string name="image_not_exists">Image not exists</string>
-    <string name="preprocess_to_png">Preprocess input image to PNG</string>
-    <string name="extra_path">Path for custom models</string>
-    <string name="path_not_exist">Not exist this directory</string>
-    <string name="path_not_dir">The path is a file, not a directory</string>
-    <string name="auto_save">Save image to gallery after processing</string>
-    <string name="show_serarch_view">Show command input area</string>
-    <string name="show_final_command">Show final command before execution</string>
-    <string name="use_custom_label">Use custom labels</string>
-    <string name="edit_label">Edit label</string>
-    <string name="custom_label">Custom label</string>
-    <string name="default_label">Default label</string>
-    <string name="notification_channel_progress">Processing Progress</string>
-    <string name="notification_channel_alive">Service Running</string>
-    <string name="notification_processing">Processing…</string>
-    <string name="notification_fail">Processing failed</string>
-    <string name="notification_complete">Processing complete</string>
-    <string name="notification_channel_progress_description">Shows detailed processing progress</string>
-    <string name="notification_channel_alive_description">Keeps service alive in background</string>
     <string name="default_classical_filters">nearest</string>
     <string name="default_magick_filters">Lanczos</string>
-    <string name="help_text">Help</string>
-    <string name="menu_help">Help</string>
-    <string name="model">Model</string>
-    <string name="system_version">System</string>
-    <string name="cpu_model">CPU</string>
-    <string name="ram_size">RAM</string>
-    <string name="device_info">Device Info</string>
-    <string name="batch_processing">Batch Processing</string>
-    <string name="input_dir">Input Directory</string>
-    <string name="output_dir">Output Directory</string>
-    <string name="start_batch">Start Batch</string>
-    <string name="stop_batch">Stop Batch</string>
-    <string name="processing">Processing…</string>
-    <string name="video_processing">Video Upscaling</string>
-    <string name="select_video">Select Video</string>
-    <string name="start_video">Start Video Upscaling</string>
-    <string name="extracting_frames">Extracting frames…</string>
-    <string name="upscaling_frames">Upscaling frames…</string>
-    <string name="reassembling_video">Reassembling video…</string>
-    <string name="video_complete">Video upscaling complete!</string>
-    <string name="video_failed">Video upscaling failed</string>
 
     <!-- Style arrays for command labels -->
     <string-array name="style_array">

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">PhotoForge</string>
     <string name="home_subtitle">照片修复 · Real-ESRGAN · 离线</string>
     <string name="preparing_engines">正在准备引擎…</string>
     <string name="select_photo">选择照片</string>
@@ -11,13 +12,18 @@
     <string name="profile_balance">平衡</string>
     <string name="profile_max">最大</string>
     <string name="profile_no_ai_desc">快速高质量放大，不重绘</string>
-    <string name="profile_soft_desc">20% AI · 最大程度保留原图</string>
-    <string name="profile_balance_desc">35% AI · 自然均衡清理</string>
-    <string name="profile_max_desc">50% AI · 加强修复但不完全重绘</string>
+    <string name="profile_soft_desc" formatted="false">20% AI · 最大程度保留原图</string>
+    <string name="profile_balance_desc" formatted="false">35% AI · 自然均衡清理</string>
+    <string name="profile_max_desc" formatted="false">50% AI · 加强修复但不完全重绘</string>
     <string name="improve_photo">增强照片</string>
     <string name="restoring">正在修复…</string>
     <string name="stop_processing">停止</string>
     <string name="result_title">结果</string>
+    <string name="result_placeholder">增强后的照片将显示在这里</string>
+    <string name="save_to_gallery">保存到相册</string>
+    <string name="save_log">保存日志</string>
+    <string name="no_output">暂无结果</string>
+    <string name="professional_profile">专业修复配置</string>
     <string name="nav_home">增强</string>
     <string name="nav_settings">设置</string>
     <string name="settings_title">设置</string>
@@ -26,8 +32,9 @@
     <string name="performance_title">性能</string>
     <string name="tile_size_label">分块大小（0 = 自动）</string>
     <string name="auto_save_results">自动保存结果</string>
-    <string name="cpu_mode">CPU 兼容模式</string>
     <string name="github_button">GitHub · OlegBawq</string>
     <string name="telegram_button">Telegram · @niix3</string>
     <string name="source_button">PhotoForge 源代码</string>
+    <string name="default_classical_filters">最近邻</string>
+    <string name="default_magick_filters">Lanczos</string>
 </resources>
